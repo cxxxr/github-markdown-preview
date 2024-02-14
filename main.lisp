@@ -30,7 +30,7 @@
 (defun render (text)
   (let ((html (dex:post "https://api.github.com/markdown"
                         :headers `(("Accept" . "application/vnd.github+json")
-                                   ("Authorization" . ,(format nil "Bearer ~A" *access-token*))
+                                   ("Authorization" . ,(format nil "Bearer ~A" (access-token)))
                                    ("X-GitHub-Api-Version" . "2022-11-28"))
                         :content (jojo:to-json `(("text" . ,text)) :from :alist))))
     (lisp-preprocessor:run-template-into-string
