@@ -6,6 +6,27 @@
 
 (defvar *access-token*)
 
+(define-condition github-markdown-preview-error (error) ())
+
+(define-condition unbound-access-token (github-markdown-preview-error)
+  ()
+  (:report "The variable *access-token* is unbound."))
+
+(defun ask-token ()
+  (trivial-open-browser:open-browser "https://github.com/settings/tokens?type=beta")
+  (format t "Please enter your token: ")
+  (force-output)
+  (list (read-line)))
+
+(defun access-token ()
+  (unless (boundp '*access-token*)
+    (restart-case (error 'unbound-access-token)
+      (set-access-token (v)
+        :report "Enter your token: "
+        :interactive ask-token
+        (setf *access-token* v))))
+  *access-token*)
+
 (defun render (text)
   (let ((html (dex:post "https://api.github.com/markdown"
                         :headers `(("Accept" . "application/vnd.github+json")
